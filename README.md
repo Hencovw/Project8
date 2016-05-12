@@ -1,6 +1,10 @@
 # Getting-and-Cleaning-Data-Course-Project
 Getting and Cleaning Data Course Project
 
+The runAnalysis will contain the program used to creatre the tidy dataset
+Codebook will contail
+
+
 You should create one R script called run_analysis.R that does the following.
 
 Merges the training and the test sets to create one data set.
