@@ -19,7 +19,7 @@ yTest <- read.table("./test/Y_test.txt" ,header=FALSE, sep="")
 colnames(xTrain) <- features[,2]
 colnames(xTest) <- features[,2]
 
-#Couldnt find a table with headings for them, so manually made it something descriptive
+#Change the heading to be more descriptive
 colnames(activityType) <- c('activityId','activityType')
 
 colnames(subjectTrain) <- "subjectId"
