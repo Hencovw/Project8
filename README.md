@@ -1,4 +1,3 @@
-project 8 Machine learning
 Introduction: project 8 - Machine learning
 
 I used the libraries caret, ggplot2, GGally and gbm. Firstly importing the data, into training and testing set. I then make sure that all variables is either a factor or numeric variables, also removing all columns with zero variance.
