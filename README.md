@@ -1,24 +1,12 @@
-# Getting-and-Cleaning-Data-Course-Project
-Getting and Cleaning Data Course Project
+project 8 Machine learning
+Introduction: project 8 - Machine learning
 
-The runAnalysis will contain the program used to creatre the tidy dataset
-Codebook will contail
+I used the libraries caret, ggplot2, GGally and gbm. Firstly importing the data, into training and testing set. I then make sure that all variables is either a factor or numeric variables, also removing all columns with zero variance.
 
+Further i then set aside about 25% of the data for a validation set. this is to check that no over fitting is happening and that the models hold true on unseen data.
 
-You should create one R script called run_analysis.R that does the following.
+Cross validation techniques were used as part of the modelling. Splitting the data into 6 folds and repeating the exercise twice.
 
-Merges the training and the test sets to create one data set.
-Extracts only the measurements on the mean and standard deviation for each measurement.
-Uses descriptive activity names to name the activities in the data set
-Appropriately labels the data set with descriptive variable names.
-From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+Two models were tested random forest and gradient boosting. Giving very similar results on the validation set. Random forest had slight edge on the confusion matrix. Confusion matrix classification matrix was the key measure of validation that the models are holding true. The models performed exceptionally well with an accuracy of 99,8%. thus with almost complete certainty the outcome can be predicted.
 
-Started by downloading the files and extracting to my working directory
-All the data was then imported into R
-All the coloum names was changed to be more secriptive.
-Cbind and Rbind was used to add all the addtional data, as well as combine test and training data
-
-Activity was merged.
-All heading were ficed, punctiuation was removed and neatened. 
-
-All variables summarized and writen out to  at diy data text file. 
+Lastly it was run on the testing set and the results from the exercise gave 20/20 results.
