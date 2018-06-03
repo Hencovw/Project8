@@ -1,0 +1,128 @@
+---
+title: "project 8 Machine learning"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Introduction: project 8 - Machine learning
+
+I used the libraries caret, ggplot2, GGally and gbm.  Firstly importing the data, into training and testing set.  I then make sure that all variables is either a factor or numeric variables, also removing all columns with zero variance.  
+
+Further i then set aside about 25% of the data for a validation set.  this is to check that no over fitting is happening and that the models hold true on unseen data.  
+
+Cross validation techniques were used as part of the modelling. Splitting the data into 6 folds and repeating the exercise twice. 
+
+Two models were tested random forest and gradient boosting.  Giving very similar results on the validation set.  Random forest had slight edge on the confusion matrix.   Confusion matrix classification matrix was the key measure of validation that the models are holding true.  The models performed exceptionally well with an accuracy of 99,8%.  thus with almost complete certainty the outcome can be predicted. 
+
+Lastly it was run on the testing set and the results from the exercise gave 20/20 results.
+
+
+```{r code,echo=TRUE,warning=FALSE,message=FALSE}
+library(caret)
+library(ggplot2)
+library(GGally)
+library(gbm)
+
+# Importing and combining the data
+testing = read.csv("C:/Coursera/JohnH/Machine learning/pml-testing.csv",na.strings=c("NA","#DIV/0!",""))
+training = read.csv("C:/Coursera/JohnH/Machine learning/pml-training.csv", na.strings=c("NA","#DIV/0!",""))
+
+testing$classe = "A"
+testing$control = 1
+training$control = 0
+training$problem_id = 999
+
+combined = rbind(testing,training)
+
+# Remove columns with zero variance (useless columns for prediction)
+levelsPerColumn = lapply(combined, function(x) length(unique(x)))
+drop = which(levelsPerColumn == 1)
+if (length(drop) > 0){
+  combined = combined[,-unlist(drop)]
+}
+nums = sapply(combined, is.numeric)
+Allnumeric = combined[, nums]
+Allfactors = combined[, !nums]
+
+for(i in c(1:ncol(Allnumeric))) {
+  Allnumeric[,i] = as.numeric(Allnumeric[,i])
+}
+
+for(i in c(1:ncol(Allfactors))) {
+  Allfactors[,i] = as.factor(Allfactors[,i])
+}
+
+combined = cbind(Allnumeric, Allfactors)
+
+
+# splitting and preping the data
+testing = subset(combined, combined$control == 1)
+training = subset(combined, combined$control == 0)
+
+set.seed(123) 
+inTrain = createDataPartition(training$classe, p = 3/4)[[1]]
+training = training[ inTrain,]
+testingcross = training[-inTrain,]
+
+training = training[, -which(colMeans(is.na(training)) > 0.4)]
+
+training$control = NULL
+testingcross$control = NULL
+testing$control = NULL
+training$X = NULL
+
+
+# Gradient boosting Model, With cross validation number =6 and repeats = 6 
+Control = trainControl(method = "repeatedcv",
+                           number = 6,
+                           repeats = 2)
+
+mod_gbm = train(classe  ~ ., data = training, method = "gbm",na.action = na.omit,trControl = Control,verbose=FALSE)
+
+testing_pred = predict(mod_gbm, testingcross, type = "raw")
+fitgbm = confusionMatrix(testing_pred, testingcross$classe)
+fitgbm
+varImp(mod_gbm)
+
+
+# Random Forest - 150 trees and min node size = 50
+control = trainControl(method="repeatedcv", number=10, repeats=3)
+metric = "Accuracy"
+mtry = sqrt(ncol(training))
+tunegrid = expand.grid(.mtry=mtry)
+
+mod_rf = train(classe  ~ ., data = training, method = "rf",ntree=150,nodesize = 50 , verbose=FALSE,na.action = na.omit,try=3,allowParallel = TRUE)
+
+testing_predRF = predict(mod_rf, testingcross, type = "raw")
+fitrf = confusionMatrix(testing_predRF, testingcross$classe)
+fitrf
+
+varImp(mod_rf)
+
+testing$GBM = predict(mod_gbm,testing, type = "raw")
+testing$RF = predict(mod_rf,testing, type = "raw")
+
+```
+
+
+List of most important parameters in the model, followed by Random forest and GBM confusion matrix,  the accuracy for both models being high 99%
+```{r summary, echo=TRUE}
+
+varImp(mod_rf)
+
+table(testing_predRF, testingcross$classe)
+
+table(testing_pred, testingcross$classe)
+
+
+```
+
+
+Conclusion:
+
+The models performed exceptionally on the validation and testing set. Little difference between random forest and gbm, and either one can be used.   Final accuracy of 99.8%.  
+Full comfort that the models can be deployed. 
+
